@@ -53,14 +53,21 @@
 // });
 
 
-
 const { app, BrowserWindow } = require('electron');
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors');
+const cors = require('cors'); 
+const { exec } = require('child_process');
 
-app.commandLine.appendSwitch('no-sandbox');
-app.commandLine.appendSwitch('disable-gpu');
+// Start virtual display for headless server
+exec('Xvfb :99 -screen 0 1280x800x16 &', (err) => {
+    if (err) {
+        console.error("Failed to start Xvfb:", err);
+    } else {
+        console.log("Xvfb started successfully!");
+        process.env.DISPLAY = ":99";
+    }
+});
 
 const server = express();
 server.use(bodyParser.json());
@@ -68,6 +75,7 @@ server.use(cors());
 
 let win = null;
 
+// API to Open Selected Website in Electron
 server.post('/open', (req, res) => {
     const { url } = req.body;
     if (!url) {
@@ -97,6 +105,12 @@ server.post('/open', (req, res) => {
     res.json({ success: true });
 });
 
+// Prevent Electron from quitting when the window is closed
+app.on('window-all-closed', (event) => {
+    event.preventDefault();
+});
+
+// Start Express Server
 app.whenReady().then(() => {
     server.listen(5000, () => {
         console.log("Electron Server Running on http://localhost:5000");
