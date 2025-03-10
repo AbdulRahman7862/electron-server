@@ -56,7 +56,7 @@
 const { app, BrowserWindow } = require('electron');
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors'); 
+const cors = require('cors');
 const { exec } = require('child_process');
 
 // Start virtual display for headless server
@@ -113,6 +113,6 @@ app.on('window-all-closed', (event) => {
 // Start Express Server
 app.whenReady().then(() => {
     server.listen(5000, () => {
-        console.log("Electron Server Running on http://localhost:5000");
+        console.log("Electron Server Running on http://0.0.0.0:5000");
     });
 });
